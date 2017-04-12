@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rsc/mirror-reflection.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,219 @@
+#include "wallmodel.h"
+
+#include <QVector>
+#include <QDebug>
+
+WallModel::WallModel(const QList<Wall> &initWalls, QObject *parent)
+    : QAbstractItemModel(parent)
+{
+    if (initWalls.size()) {
+        beginInsertRows(QModelIndex(),0, initWalls.size() - 1);
+        walls = initWalls;
+        endInsertRows();
+    }
+}
+
+QVariant WallModel::headerData(int section, Qt::Orientation /*orientation*/, int /*role*/) const
+{
+    // FIXME: Implement me!
+    switch (section)
+    {
+    case 0:
+        return QString::fromUtf8("Цвет/Аттрибут");
+    case 1:
+        return QString::fromUtf8("Стена/Значение");
+    }
+    return QVariant();
+}
+
+
+QModelIndex WallModel::index(int row, int column, const QModelIndex &parent) const
+{
+//    if (!hasIndex(row, column, parent))
+//        return QModelIndex();
+
+    if (!parent.isValid()) {
+        qDebug() << "created first" << row << column;
+        return createIndex(row, column, row * 2);
+    }
+    else {
+        return createIndex(row, column, parent.row() * 2 + 1);
+    }
+}
+
+QModelIndex WallModel::parent(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    if (index.internalId() % 2 == 0) {
+        return QModelIndex();
+    }
+
+    return WallModel::index(index.internalId()/2, 0, QModelIndex());
+}
+
+int WallModel::rowCount(const QModelIndex &parent) const
+{
+    if (!parent.isValid())
+        return walls.size();
+
+    if (parent.parent().isValid())
+        return 0;
+    return AttributeRowCnt;
+}
+
+int WallModel::columnCount(const QModelIndex &parent) const
+{
+//    if (!parent.isValid())
+//        return 1;
+
+//    if (parent.isValid() && !parent.parent().isValid()) {
+//        return 3;
+//    }
+    return 3;
+}
+
+QVariant WallModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    if (!index.parent().isValid()) {
+        if (role == Qt::BackgroundColorRole && index.column() == ColorColumn) {
+            return walls.at(index.row()).color;
+        }
+        if (role == Qt::DisplayRole) {
+            switch(index.column()) {
+            case TitleColumn:
+                return walls.at(index.row()).title;
+            case ColorColumn:
+                return QVariant();
+            default:
+                qWarning("WallModel::data");
+                return QVariant();
+            }
+        }
+    }
+    else {
+        if (role == Qt::DisplayRole) {
+            switch(index.row()) {
+            case LeftRow:
+                switch(index.column()) {
+                case AttributeName:
+                    return QString::fromUtf8("Левая т.");
+                case AttributeValue:
+                    return walls.at(index.parent().row()).left.x();
+                case AttributeValue + 1:
+                    return walls.at(index.parent().row()).left.y();
+                }
+            case RightRow:
+                switch(index.column()) {
+                case AttributeName:
+                    return QString::fromUtf8("Правая т.");
+                case AttributeValue:
+                    return walls.at(index.parent().row()).right;
+                case AttributeValue + 1:
+                    return walls.at(index.parent().row()).right.y();
+                }
+            case WallTypeRow:
+                switch(index.column()) {
+                case AttributeName:
+                    return QString::fromUtf8("Тип");
+                case AttributeValue:
+                    return walls.at(index.parent().row()).typeString();
+                }
+            case RadiusRow:
+                switch(index.column()) {
+                case AttributeName:
+                    return QString::fromUtf8("Радиус");
+                case AttributeValue:
+                    return walls.at(index.parent().row()).radius;
+                }
+
+            case CoeffRow:
+                switch(index.column()) {
+                case AttributeName:
+                    return QString::fromUtf8("Коэффициент");
+                case AttributeValue:
+                    return walls.at(index.parent().row()).coeff;
+                }
+
+            default:
+                qWarning("WallModel::data second");
+                return QVariant();
+            }
+        }
+    }
+    // FIXME: Implement me!
+    return QVariant();
+}
+
+bool WallModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (data(index, role) != value) {
+        if (role == Qt::EditRole) {
+            if (index.parent().isValid()) {
+                switch(index.column()) {
+
+                }
+            }
+            else {
+                switch(index.row()) {
+                case LeftRow:
+                    switch(index.column()) {
+                    case AttributeValue:
+                        return walls.at(index.parent().row()).left.setX(data(index, role).toInt());
+                    case AttributeValue + 1:
+                        return walls.at(index.parent().row()).left.setY(data(index, role).toInt());
+                    }
+                case RightRow:
+                    switch(index.column()) {
+                    case AttributeValue:
+                        return walls.at(index.parent().row()).right.setX(data(index, role).toInt());
+                    case AttributeValue + 1:
+                        return walls.at(index.parent().row()).right.setY(data(index, role).toInt());
+                    }
+                case WallTypeRow:
+                    switch(index.column()) {
+                    case AttributeValue:
+                        return walls.at(index.parent().row()).setTypeFromString(data(index, role).toString());
+                    }
+                case RadiusRow:
+                    switch(index.column()) {
+                    case AttributeValue:
+                        return walls.at(index.parent().row()).radius = data(index, role).toDouble();
+                    }
+
+                case CoeffRow:
+                    switch(index.column()) {
+                    case AttributeValue:
+                        return walls.at(index.parent().row()).coeff = data(index, role).toDouble();
+                    }
+
+                default:
+                    qWarning("WallModel::setData");
+                    return false;
+                }
+            }
+        }
+
+
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
+}
+
+Qt::ItemFlags WallModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    if (index.parent().isValid()) {
+        if (index.column() == AttributeName)
+            return Qt::ItemIsEnabled;
+    }
+
+    return Qt::ItemIsEditable | Qt::ItemIsEnabled; // FIXME: Implement me!
+}
