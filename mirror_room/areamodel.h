@@ -13,6 +13,7 @@ struct Figure
         FEllipse
     };
 
+    Figure() : type(FLine) { xc=yc=rx=ry=0;} // for serialization
     Figure(int xcv, int ycv, int rxv, int ryv)
         : type(FEllipse), xc(xcv), yc(ycv), rx(rxv), ry(ryv) {}
     Figure(const QLine &line)
@@ -28,7 +29,13 @@ struct Figure
     int yc;
     int rx;
     int ry;
+
+    friend QDataStream &operator<<(QDataStream &ds, const Figure &f);
+    friend QDataStream &operator>>(QDataStream &ds, Figure &f);
 };
+
+QDataStream &operator<<(QDataStream &ds, const Figure &f);
+QDataStream &operator>>(QDataStream &ds, Figure &f);
 
 class AreaModel : public QAbstractItemModel
 {
@@ -63,7 +70,7 @@ class AreaModel : public QAbstractItemModel
 
         RowTypeEllipseCount
     };
-private slots:
+public slots:
     void calcPath();
 signals:
     void areaPathChanged();
@@ -98,6 +105,12 @@ public:
 private:
     QList<Figure> figures;
     QPainterPath path;
+
+    friend QDataStream &operator<<(QDataStream &ds, const AreaModel &m);
+    friend QDataStream &operator>>(QDataStream &ds, AreaModel &m);
 };
+
+QDataStream &operator<<(QDataStream &ds, const AreaModel &m);
+QDataStream &operator>>(QDataStream &ds, AreaModel &m);
 
 #endif // AREAMODEL_H

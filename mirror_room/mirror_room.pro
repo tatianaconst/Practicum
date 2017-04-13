@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     areamodel.cpp \
     scene.cpp \
     areagraphicsitem.cpp \
-    raygraphicsitem.cpp
+    raygraphicsitem.cpp \
+    wizardwelcome.cpp
 #    glm/detail/dummy.cpp \
 #    glm/detail/func_common.inl \
 #    glm/detail/func_common_simd.inl \
@@ -158,7 +159,9 @@ HEADERS  += mainwindow.h \
     areamodel.h \
     scene.h \
     areagraphicsitem.h \
-    raygraphicsitem.h
+    raygraphicsitem.h \
+    extensions.h \
+    wizardwelcome.h
 #    glm/detail/_features.hpp \
 #    glm/detail/_fixes.hpp \
 #    glm/detail/_noise.hpp \
@@ -307,7 +310,8 @@ HEADERS  += mainwindow.h \
 #    glm/vec4.hpp \
 #    glm/vector_relational.hpp
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    wizardwelcome.ui
 
 RESOURCES += \
     icons.qrc

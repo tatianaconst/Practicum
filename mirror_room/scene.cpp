@@ -13,7 +13,7 @@ Scene::Scene(QObject *parent)
 
 //}
 
-void Scene::setWalls(QList<Wall *> &walls)
+void Scene::setWalls(const QList<Wall *> &walls)
 {
     foreach (Wall *pWall, walls)
         addItem(new WallGraphicsItem(pWall));

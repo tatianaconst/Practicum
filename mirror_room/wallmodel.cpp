@@ -1,5 +1,6 @@
 #include "wallmodel.h"
 #include "wallmodeldelegate.h"
+#include "extensions.h"
 
 #include <QVector>
 #include <QDebug>
@@ -7,11 +8,7 @@
 WallModel::WallModel(const QList<Wall*> &initWalls, QObject *parent)
     : QAbstractItemModel(parent)
 {
-    if (initWalls.size()) {
-        beginInsertRows(QModelIndex(),0, initWalls.size() - 1);
-        walls = initWalls;
-        endInsertRows();
-    }
+    setWalls(initWalls);
 }
 
 QVariant WallModel::headerData(int section, Qt::Orientation /*orientation*/, int /*role*/) const
@@ -267,4 +264,68 @@ Qt::ItemFlags WallModel::flags(const QModelIndex &index) const
 QList<Wall *> WallModel::getWalls()
 {
     return walls;
+}
+
+void WallModel::clear()
+{
+    if (walls.size()) {
+        beginRemoveRows(QModelIndex(), 0, walls.size() - 1);
+
+        walls.clear();
+
+        endRemoveRows();
+    }
+}
+
+void WallModel::setWalls(const QList<Wall *> &initWalls)
+{
+    if (initWalls.size()) {
+        beginInsertRows(QModelIndex(),0, initWalls.size() - 1);
+    }
+
+    walls = initWalls;
+    if (!walls.isEmpty()) {
+        for (int i=0; i < walls.size(); ++i) {
+            walls[i]->connectLeft((i > 0
+                                   ? walls[i-1]
+                                   : walls.last()));
+            walls[i]->connectRight((i < walls.size()-1
+                                    ? walls[i+1]
+                                    : walls.first()));
+        }
+    }
+
+    if (initWalls.size()) {
+        endInsertRows();
+    }
+}
+
+QDataStream &operator<<(QDataStream &ds, const WallModel &m)
+{
+    ds << m.walls.size();
+
+    for (int i=0; i < m.walls.size(); ++i)
+        ds << *m.walls.at(i);
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, WallModel &m)
+{
+    if (!m.walls.isEmpty()) {
+        qWarning("Clear WallModel before serialization!");
+        return ds;
+    }
+    int size;
+    ds >> size;
+
+    QList<Wall*> walls;
+    for (int i=0; i < size; ++i) {
+        Wall *wall = new Wall();
+        ds >> *wall;
+        walls.append(wall);
+    }
+
+    m.setWalls(walls);
+    return ds;
 }

@@ -87,7 +87,7 @@ QPainterPath WallGraphicsItem::shape() const
 void WallGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    painter->setPen(QPen(QBrush(Qt::black), 2));
+    painter->setPen(QPen(QBrush(wall->getColor()), 2));
     painter->drawPath(path);
 }
 

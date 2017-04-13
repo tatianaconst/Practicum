@@ -7,6 +7,8 @@
 #include "wallmodel.h"
 #include "areamodel.h"
 #include "raygraphicsitem.h"
+#include "scene.h"
+#include "wizardwelcome.h"
 
 // -- END TEST INCLUDE
 
@@ -23,14 +25,18 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void setModelWalls(const QList<Wall*> &walls);
+    void setModelArea(const QList<Figure> &figures);
+    RayGraphicsItem *getRayRef() { return ray;}
+public slots:
+    void finish();
+    void setSpinBoxes(qreal x, qreal y, qreal angle);
+
 private slots:
 
     void on_pushButtonAddLine_clicked();
     void on_pushButtonAddEllipse_clicked();
     void on_pushButtonClear_clicked();
-
-    void onChangeInWalls(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    void onChangeInArea(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
     void on_pushButtonBuild_clicked();
 
@@ -38,7 +44,13 @@ private slots:
 
     void fillRayParams();
 
+    void on_actionSave_triggered();
+
+
+    void on_pushButtonRe_clicked();
+
 private:
+    Scene *scene;
     RayGraphicsItem *ray;
     WallModel *modelWalls;
     AreaModel *modelArea;
