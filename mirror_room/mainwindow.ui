@@ -108,16 +108,23 @@
             </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButtonBuild">
+            <widget class="QPushButton" name="pushButtonStep">
              <property name="text">
-              <string>Построить</string>
+              <string>Шаг луча</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButtonStep">
+            <widget class="QPushButton" name="pushButtonBuild">
              <property name="text">
-              <string>Шаг луча</string>
+              <string>Достроить</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonRe">
+             <property name="text">
+              <string>Сначала</string>
              </property>
             </widget>
            </item>
@@ -228,9 +235,16 @@
      <x>0</x>
      <y>0</y>
      <width>942</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuConfiguration">
+    <property name="title">
+     <string>Конфигурация</string>
+    </property>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuConfiguration"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -241,6 +255,16 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionSave">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Загрузить</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

@@ -1,5 +1,7 @@
 #include "wall.h"
 
+#include <QDataStream>
+
 //Wall::Wall()
 //    : radius(0)
 //{
@@ -18,6 +20,7 @@ void Wall::setRight(const QPoint &value)
 
     right = value;
     emit rightChanged();
+    emit rightChangedToNeighbor(right);
 }
 
 QPoint Wall::getLeft() const
@@ -32,6 +35,7 @@ void Wall::setLeft(const QPoint &value)
 
     left = value;
     emit leftChanged();
+    emit leftChangedToNeighbor(left);
 }
 
 qreal Wall::getRadius() const
@@ -99,6 +103,12 @@ void Wall::init()
     connect(this, SIGNAL(typeChanged()), this, SIGNAL(changed()));
 }
 
+Wall::Wall()
+{
+    init();
+    // for serialization/deserialization
+}
+
 
 Wall::Wall(const QString &titleVal,
            const QPoint &leftVal,
@@ -116,6 +126,24 @@ Wall::Wall(const QString &titleVal,
     radius = radiusVal;
     coeff = coeffVal;
     color = colorVal;
+}
+
+void Wall::connectLeft(Wall *leftNeighbor)
+{
+    // disconnect last first
+    disconnect(SIGNAL(leftChangedToNeighbor(const QPoint &)));
+
+    connect(this, SIGNAL(leftChangedToNeighbor(QPoint)),
+            leftNeighbor, SLOT(setRight(QPoint)));
+}
+
+void Wall::connectRight(Wall *rightNeighbor)
+{
+    // disconnect last first
+    disconnect(SIGNAL(rightChangedToNeighbor(const QPoint &)));
+
+    connect(this, SIGNAL(rightChangedToNeighbor(QPoint)),
+            rightNeighbor, SLOT(setLeft(QPoint)));
 }
 
 QPoint Wall::getCenter() const
@@ -200,4 +228,38 @@ QString Wall::WallTypeToString(const Wall::WallType &type)
     }
     qWarning("Wall::WallTypeToString");
     return QString();
+}
+
+QDataStream &operator<<(QDataStream &ds, const Wall &w)
+{
+    ds << w.title;
+    ds << w.color;
+    ds << w.left;
+    ds << w.right;
+    ds << w.radius;
+    ds << w.coeff;
+    ds << w.center;
+    ds << w.startAngle;
+    ds << w.spanAngle;
+    ds << w.type;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, Wall &w)
+{
+    ds >> w.title;
+    ds >> w.color;
+    ds >> w.left;
+    ds >> w.right;
+    ds >> w.radius;
+    ds >> w.coeff;
+    ds >> w.center;
+    ds >> w.startAngle;
+    ds >> w.spanAngle;
+    int wtype;
+    ds >> wtype;
+    w.type = static_cast<Wall::WallType>(wtype);
+
+    return ds;
 }

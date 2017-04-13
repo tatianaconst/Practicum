@@ -14,7 +14,7 @@ public:
     explicit Scene(QObject *parent = 0);
 
 //    void clear();
-    void setWalls(QList<Wall*> &walls);
+    void setWalls(const QList<Wall *> &walls);
     void setArea(AreaModel *model);
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);

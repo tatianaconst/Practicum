@@ -1,4 +1,6 @@
 #include "areamodel.h"
+
+#include <QDataStream>
 #include <QDebug>
 
 AreaModel::AreaModel(QObject *parent)
@@ -9,7 +11,7 @@ AreaModel::AreaModel(QObject *parent)
     connect(this, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(calcPath()));
 }
 
-QVariant AreaModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
+QVariant AreaModel::headerData(int section, Qt::Orientation /*orientation*/, int /*role*/) const
 {
     switch(section) {
     case 0:
@@ -330,6 +332,7 @@ void AreaModel::calcPath()
     foreach (const Figure &figure, figures) {
 
         if (figure.type == Figure::FEllipse) {
+            firstLine = true;
             result.addEllipse(QPointF(figure.xc, figure.yc), figure.rx, figure.ry);
         }
         else {
@@ -346,4 +349,45 @@ void AreaModel::calcPath()
     path.setFillRule(Qt::WindingFill);
     qDebug() << result;
     emit areaPathChanged();
+}
+
+QDataStream &operator<<(QDataStream &ds, const AreaModel &m)
+{
+    ds << m.figures;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, AreaModel &m)
+{
+    ds >> m.figures;
+    m.calcPath();
+
+    return ds;
+}
+
+QDataStream &operator<<(QDataStream &ds, const Figure &f)
+{
+    ds << f.type;
+    ds << f.line;
+    ds << f.xc;
+    ds << f.yc;
+    ds << f.rx;
+    ds << f.ry;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, Figure &f)
+{
+    int ftype;
+    ds >> ftype;
+    f.type = static_cast<Figure::FigureType>(ftype);
+    ds >> f.line;
+    ds >> f.xc;
+    ds >> f.yc;
+    ds >> f.rx;
+    ds >> f.ry;
+
+    return ds;
 }

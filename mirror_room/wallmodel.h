@@ -59,8 +59,16 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const;
 
     QList<Wall *> getWalls();
+    void clear();
 private:
+    void setWalls(const QList<Wall*> &initWalls);
     QList<Wall*> walls;
+
+    friend QDataStream &operator<<(QDataStream &ds, const WallModel &m);
+    friend QDataStream &operator>>(QDataStream &ds, WallModel &m);
 };
+
+QDataStream &operator<<(QDataStream &ds, const WallModel &m);
+QDataStream &operator>>(QDataStream &ds, WallModel &m);
 
 #endif // WALLMODEL_H

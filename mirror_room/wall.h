@@ -35,8 +35,13 @@ private:
     WallType type;
 
     void init();
+public slots:
+    void setCenter(const QPoint &value);
+    void setRight(const QPoint &value);
+    void setLeft(const QPoint &value);
 public:
 //    Wall(const Wall &W);
+    Wall();
     Wall(const QString &titleVal,
          const QPoint &leftVal,
          const QPoint &rightVal,
@@ -46,8 +51,9 @@ public:
          const QColor &colorVal = Qt::gray
          );
 
+    void connectLeft(Wall *leftNeighbor);
+    void connectRight(Wall *rightNeighbor);
     QPoint getCenter() const;
-    void setCenter(const QPoint &value);
 
     WallType getType() const;
     void setType(const WallType &value);
@@ -56,10 +62,8 @@ public:
     void setTitle(const QString &value);
 
     QPoint getRight() const;
-    void setRight(const QPoint &value);
 
     QPoint getLeft() const;
-    void setLeft(const QPoint &value);
 
     qreal getRadius() const;
     void setRadius(const qreal &value);
@@ -82,6 +86,9 @@ public:
     void setStartAngle(const qreal &value);
 
 signals:
+    void leftChangedToNeighbor(const QPoint &p);
+    void rightChangedToNeighbor(const QPoint &p);
+
     void titleChanged();
     void colorChanged();
     void leftChanged();
@@ -91,7 +98,13 @@ signals:
     void typeChanged();
 
     void changed();
+
+private:
+    friend QDataStream &operator<<(QDataStream &ds, const Wall &w);
+    friend QDataStream &operator>>(QDataStream &ds, Wall &w);
 };
 
+QDataStream &operator<<(QDataStream &ds, const Wall &w);
+QDataStream &operator>>(QDataStream &ds, Wall &w);
 
 #endif // WALL_H

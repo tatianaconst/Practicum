@@ -20,5 +20,7 @@ void AreaGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 //    painter->setPen(QPen(QBrush(Qt::black), 1));
 //    painter->setBrush(QBrush(Qt::red));
-    painter->fillPath(model->getPath(),QBrush(Qt::red));
+    QColor areaColor;
+    areaColor.setNamedColor("#98FF5C");
+    painter->fillPath(model->getPath(),QBrush(areaColor));
 }
